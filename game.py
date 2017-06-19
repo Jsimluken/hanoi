@@ -178,7 +178,10 @@ def paint_cursor(screen,cursor):
 def main():
     pygame.init()
     screen = pygame.display.set_mode((width,length))
-    size = int(raw_input())
+    args = sys.argv
+    size = 3
+    if len(args)>1:
+        size = int(args[1])
     hanoi = HanoiTower(size)
     cursor = 0
     auto_flag = False
