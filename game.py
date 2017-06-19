@@ -29,10 +29,12 @@ class HanoiTower:
         self.towers = [Tower() for _ in xrange(3)]
         self.towers[0] = Tower(range(1,self.size+1))
         self.assist_queue = []
+        self._is_solve = False
 
     def reset(self):
         self.towers = [Tower() for _ in xrange(3)]
         self.towers[0] = Tower(range(1,self.size+1))
+        self._is_solve = False
 
     def calc_evaidx(self,src,dst):
         src_bit = (2-src)<<1
@@ -45,6 +47,11 @@ class HanoiTower:
             eva_bit /=2
         return eva
 
+    def is_solve(self):
+        for i in xrange(self.size,0,-1):
+            if self.get_locate_num(i)[0] != 2:
+                return False
+        return True
 
     def get_tower(self,i):
         return self.towers[i].data
@@ -154,13 +161,14 @@ def paint_towers(screen,hanoi):
     #screen.fill((0, 0, 0, 0))
     lgth = width - (offsetx * 2)
     div = lgth /2
+
     for i in xrange(3):
         pygame.draw.line(screen, (100,100,100), (offsetx+div*i,5*offsety), (offsetx+div*i,length-offsety), 3)
         x = offsetx+div*i
         y = length - offsety
         l = (length - offsety)/hanoi.size
         l = 50 if l>50 else l
-        w_rate = 50
+        w_rate = div / hanoi.size
         data = reversed(hanoi.towers[i].data)
         #print data
         for d in data:
@@ -220,6 +228,10 @@ def main():
         if auto_flag:
             auto_flag = hanoi.auto_move()
         #screen.fill((0,0,0,0),Rect(0,0,width,length))
+        if not hanoi._is_solve:
+            if hanoi.is_solve():
+                hanoi._is_solve = True
+                print "Congratulation!!"
         pygame.display.update()
         pygame.time.wait(120)
         screen.fill((0,0,0))
