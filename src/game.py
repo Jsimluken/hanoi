@@ -112,7 +112,7 @@ class HanoiTower:
             src,idx = self.get_locate_num(i)
             if src == 2:
                 continue
-            print "assist num{0} idx{1} src{2} dst2".format(i,idx,src)
+            #print("assist num{0} idx{1} src{2} dst2".format(i,idx,src))
             if self.atm_move(idx,src,2):
                 break
         #print self.assist_inst
@@ -123,7 +123,7 @@ class HanoiTower:
     def atm_move(self,idx,src,dst):
         s_num = self.get_tower(src)[idx]
         dst_len = len(self.get_tower(dst))
-        print "atm num{3} idx{0} src{1} dst{2}".format(idx,src,dst,s_num)
+        #print "atm num{3} idx{0} src{1} dst{2}".format(idx,src,dst,s_num)
         if idx <0 or (src == dst):
             return False
         if idx == 0:   
@@ -152,10 +152,10 @@ class HanoiTower:
         eva = self.calc_evaidx(src,dst)
         return self.atm_move(idx-1,src,eva)"""
                       
-    def print_towers(self):
+    """def print_towers(self):
         for i in xrange(3):
             print self.towers[i].print_tower()
-        print ""
+        print "" """
 
 def paint_towers(screen,hanoi):
     #screen.fill((0, 0, 0, 0))
@@ -231,7 +231,7 @@ def main():
         if not hanoi._is_solve:
             if hanoi.is_solve():
                 hanoi._is_solve = True
-                print "Congratulation!!"
+                #print "Congratulation!!"
         pygame.display.update()
         pygame.time.wait(120)
         screen.fill((0,0,0))
