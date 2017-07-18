@@ -29,12 +29,12 @@ class HanoiTower:
         self.towers = [Tower() for _ in xrange(3)]
         self.towers[0] = Tower(range(1,self.size+1))
         self.assist_queue = []
-        self._is_solve = False
+        self._is_solved = False
 
     def reset(self):
         self.towers = [Tower() for _ in xrange(3)]
         self.towers[0] = Tower(range(1,self.size+1))
-        self._is_solve = False
+        self._is_solved = False
 
     def calc_evaidx(self,src,dst):
         src_bit = (2-src)<<1
@@ -47,7 +47,7 @@ class HanoiTower:
             eva_bit /=2
         return eva
 
-    def is_solve(self):
+    def is_solved(self):
         for i in xrange(self.size,0,-1):
             if self.get_locate_num(i)[0] != 2:
                 return False
@@ -156,12 +156,28 @@ class HanoiTower:
         for i in xrange(3):
             print self.towers[i].print_tower()
         print "" """
+class GameManager:
+    _instance = None
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            pygame.init()
+            cls.screen = pygame.display.set_mode((width,length))
+            sysfont = pygame.font.SysFont(None,80)
+            clear = sysfont.render("Conglatulation!!",False,(255,255,255))
+            args = sys.argv
+            size = 3
+            if len(args)>1:
+                size = int(args[1])
+            cls.hanoi = HanoiTower(size) 
+        return cls._instance
+
+
 
 def paint_towers(screen,hanoi):
     #screen.fill((0, 0, 0, 0))
     lgth = width - (offsetx * 2)
     div = lgth /2
-
     for i in xrange(3):
         pygame.draw.line(screen, (100,100,100), (offsetx+div*i,5*offsety), (offsetx+div*i,length-offsety), 3)
         x = offsetx+div*i
@@ -183,16 +199,12 @@ def paint_cursor(screen,cursor):
     div = lgth /2 
     pygame.draw.circle(screen, (255,0,0), (offsetx+cursor*div,10), 10)
 
-def main():
-    pygame.init()
-    screen = pygame.display.set_mode((width,length))
-    args = sys.argv
-    size = 3
-    if len(args)>1:
-        size = int(args[1])
-    hanoi = HanoiTower(size)
+def game_main(screen,hanoi):
     cursor = 0
     auto_flag = False
+    #man = GameManager()
+    #hanoi = man.hanoi
+    #screent = man.screen
     while(True):
         paint_towers(screen,hanoi)
         paint_cursor(screen,cursor)
@@ -212,6 +224,7 @@ def main():
                 if event.key == K_RIGHT:
                     cursor = (cursor +1)%3
                 if event.key == K_r:
+                    auto_flag = False
                     hanoi.reset()
                 if event.key == K_h:
                     hanoi.assist()
@@ -228,13 +241,59 @@ def main():
         if auto_flag:
             auto_flag = hanoi.auto_move()
         #screen.fill((0,0,0,0),Rect(0,0,width,length))
-        if not hanoi._is_solve:
-            if hanoi.is_solve():
-                hanoi._is_solve = True
-                #print "Congratulation!!"
+        if not hanoi._is_solved:
+            if hanoi.is_solved():
+                hanoi._is_solved = True
+                return 1
         pygame.display.update()
         pygame.time.wait(120)
         screen.fill((0,0,0))
+    while(True):
+        paint_towers(screen,hanoi)
+        screen.blit(clear,(100,100))
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+        pygame.display.update()
+        pygame.time.wait(40)
+        screen.fill((0,0,0))
+def game_clear(screen,hanoi,clear):
+    man = GameManager()
+    while(True):
+        paint_towers(screen,hanoi)
+        screen.blit(clear,(100,100))
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == KEYDOWN:
+                if event.key == K_r:
+                    return 0
+
+        pygame.display.update()
+        pygame.time.wait(120)
+        screen.fill((0,0,0))
+    
+def main():
+    pygame.init()
+    screen = pygame.display.set_mode((width,length))
+    sysfont = pygame.font.SysFont(None,80)
+    clear = sysfont.render("Conglatulation!!",False,(255,255,255))
+    args = sys.argv
+    size = 3
+    if len(args)>1:
+        size = int(args[1])
+    hanoi = HanoiTower(size) 
+    mode = 0
+    while(True):
+        
+        if mode ==0:
+            hanoi.reset()
+            mode = game_main(screen,hanoi)
+        else:
+            mode = game_clear(screen,hanoi,clear)
+    
 
 
 
